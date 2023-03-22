@@ -11,5 +11,5 @@ package com.dgsystems.gameoflife;
 public record Cell(int row, int col, char state) {
     static char Live = '@';
     static char Dead = '#';
-    static char NotSet = '@';
+    static char NotSet = '?';
 }
