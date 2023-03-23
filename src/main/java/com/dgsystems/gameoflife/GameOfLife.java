@@ -3,11 +3,11 @@
  */
 package com.dgsystems.gameoflife;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 /**
- *
  * @author Domício
  */
 public class GameOfLife {
@@ -34,6 +34,7 @@ public class GameOfLife {
     public GameOfLife() {
         cells = new CellsGraph(SIZE);
     }
+
     private static final int SIZE = 5;
 
     public static void main(String[] args) throws InterruptedException {
@@ -45,11 +46,11 @@ public class GameOfLife {
             char randomChar = chars[rand.nextInt(chars.length)];
 
             char[][] cells = {
-                {randomChar, randomChar, randomChar, randomChar, randomChar},
-                {randomChar, randomChar, randomChar, randomChar, randomChar},
-                {randomChar, randomChar, randomChar, randomChar, randomChar},
-                {randomChar, randomChar, randomChar, randomChar, randomChar},
-                {randomChar, randomChar, randomChar, randomChar, randomChar}
+                    {randomChar, randomChar, randomChar, randomChar, randomChar},
+                    {randomChar, randomChar, randomChar, randomChar, randomChar},
+                    {randomChar, randomChar, randomChar, randomChar, randomChar},
+                    {randomChar, randomChar, randomChar, randomChar, randomChar},
+                    {randomChar, randomChar, randomChar, randomChar, randomChar}
             };
 
             printCellsGrid(cells);
@@ -90,6 +91,16 @@ public class GameOfLife {
     }
 
     public void tick() {
+        //var cellsCopy = Arrays.copyOf(cells.nodes, cells.nodes.length);
+
+        // copy array
+
+        Cell[][] copiedArray = new Cell[cells.nodes.length][cells.nodes[0].length];
+
+        for (int i = 0; i < cells.nodes.length; i++) {
+            copiedArray[i] = Arrays.copyOf(cells.nodes[i], cells.nodes[i].length);
+        }
+
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 Cell cell = cells.nodes[i][j];
@@ -98,23 +109,43 @@ public class GameOfLife {
                     if (verifyBecomeAliveThreeLiveNeighbours(dead)) {
                         var updatedCell = new Live(cell.row, cell.col);
                         updatedCell.setChildren(cell.children);
-                        cells.nodes[i][j] = updatedCell;
+                        copiedArray[i][j] = updatedCell;
                     }
-                } else if (cell instanceof NotSet notSet) {
+                }
+
+                if (cell instanceof NotSet notSet) {
                     if (verifyBecomeAliveThreeLiveNeighbours(notSet)) {
                         var updatedCell = new Live(cell.row, cell.col);
                         updatedCell.setChildren(cell.children);
-                        cells.nodes[i][j] = updatedCell;
+                        copiedArray[i][j] = updatedCell;
                     }
-                } else if (cell instanceof Live live) {
-                    if(verifyBecomeDeadLessThanTwoLiveNeighbours(live)) {
+                }
+
+                if (cell instanceof Live live) {
+                    if (verifyBecomeDeadLessThanTwoLiveNeighbours(live)) {
                         var updatedCell = new Dead(cell.row, cell.col);
                         updatedCell.setChildren(cell.children);
-                        cells.nodes[i][j] = updatedCell;
+                        copiedArray[i][j] = updatedCell;
+                    }
+
+                    if (verifyBecomeDeadMoreThanThreeLiveNeighbours(live)) {
+                        var updatedCell = new Dead(cell.row, cell.col);
+                        updatedCell.setChildren(cell.children);
+                        copiedArray[i][j] = updatedCell;
                     }
                 }
             }
         }
+
+        cells.nodes = copiedArray;
+    }
+
+    private boolean verifyBecomeDeadMoreThanThreeLiveNeighbours(Live cell) {
+        return cell.children
+                .stream()
+                .map(c -> cells.nodes[c.x()][c.y()])
+                .filter(c -> c instanceof Live)
+                .count() >= 3;
     }
 
     private boolean verifyBecomeDeadLessThanTwoLiveNeighbours(Live cell) {
