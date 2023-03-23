@@ -3,7 +3,6 @@
  */
 package com.dgsystems.gameoflife;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -13,25 +12,28 @@ import java.util.Random;
  */
 public class GameOfLife {
 
-    private char[][] cells;
+    private final CellsGraph cells;
 
     public char[][] getCells() {
-        return cells;
-    }
+        char[][] array = new char[SIZE][SIZE];
 
-    public void setCells(char[][] cells) {
-        this.cells = cells;
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                Cell data = cells.nodes[i][j];
+                if(data != null)
+                    array[i][j] = data.state();
+                else
+                    array[i][j] = Cell.NotSet;
+            }
+        }
+
+        return array;
     }
 
     public GameOfLife() {
-        this.cells = new char[][]{
-            {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet},
-            {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet},
-            {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet},
-            {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet},
-            {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet}
-        };
+        cells = new CellsGraph(SIZE);
     }
+    private static final int SIZE = 5;
 
     public static void main(String[] args) throws InterruptedException {
         for (int i = 0; i < 10; i++) {
@@ -80,13 +82,13 @@ public class GameOfLife {
 
     }
 
-    public GameOfLife applySeed(List<Cell> seed) {
-        for(var cell : seed) {
-            cells[cell.row()][cell.col()] = cell.state();
+    public void applySeed(List<Cell> seed) {
+        for (var cell : seed) {
+            cells.add(cell);
         }
+    }
 
-        var updated = new GameOfLife();
-        updated.setCells(Arrays.copyOf(cells, cells.length));
-        return updated;
+    public GameOfLife tick() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
