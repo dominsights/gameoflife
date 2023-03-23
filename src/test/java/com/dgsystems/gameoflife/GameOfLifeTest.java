@@ -83,4 +83,30 @@ public class GameOfLifeTest {
         
         assertThat(gameOfLife.getCells()).isEqualTo(expected);
     }
+
+    @Test
+    public void test_any_live_cell_with_less_than_two_live_neighbours_dies() {
+        var gameOfLife = new GameOfLife();
+        List<Cell> seed = List.of(
+                new Live(2, 2),
+                new Live(1, 2),
+                new Dead(2, 3),
+                new Dead(1, 3)
+        );
+
+        gameOfLife.applySeed(seed);
+        gameOfLife.tick();
+
+        char[][] expected = {
+                {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet},
+                {Cell.NotSet, Cell.NotSet, Cell.Dead, Cell.Dead, Cell.NotSet},
+                {Cell.NotSet, Cell.NotSet, Cell.Dead, Cell.Dead, Cell.NotSet},
+                {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet},
+                {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet}
+        };
+
+        assertThat(gameOfLife.getCells()).isEqualTo(expected);
+    }
+
+    //TODO: write test to verify all cells are evaluated at the same time.
 }

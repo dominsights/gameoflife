@@ -106,9 +106,23 @@ public class GameOfLife {
                         updatedCell.setChildren(cell.children);
                         cells.nodes[i][j] = updatedCell;
                     }
+                } else if (cell instanceof Live live) {
+                    if(verifyBecomeDeadLessThanTwoLiveNeighbours(live)) {
+                        var updatedCell = new Dead(cell.row, cell.col);
+                        updatedCell.setChildren(cell.children);
+                        cells.nodes[i][j] = updatedCell;
+                    }
                 }
             }
         }
+    }
+
+    private boolean verifyBecomeDeadLessThanTwoLiveNeighbours(Live cell) {
+        return cell.children
+                .stream()
+                .map(c -> cells.nodes[c.x()][c.y()])
+                .filter(c -> c instanceof Live)
+                .count() < 2;
     }
 
     private boolean verifyBecomeAliveThreeLiveNeighbours(Cell deadCell) {
