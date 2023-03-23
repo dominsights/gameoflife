@@ -65,7 +65,8 @@ public class GameOfLifeTest {
         List<Cell> seed = List.of(
                 new Live(2, 2),
                 new Live(1, 2),
-                new Live(2, 3)
+                new Live(2, 3),
+                new Dead(1, 3)
         );
 
         gameOfLife.applySeed(seed);

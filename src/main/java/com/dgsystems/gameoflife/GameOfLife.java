@@ -20,10 +20,11 @@ public class GameOfLife {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 Cell data = cells.nodes[i][j];
-                if(data != null)
+                if (data != null) {
                     array[i][j] = data.state();
-                else
+                } else {
                     array[i][j] = Cell.NotSet;
+                }
             }
         }
 
@@ -88,7 +89,33 @@ public class GameOfLife {
         }
     }
 
-    public GameOfLife tick() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void tick() {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                Cell cell = cells.nodes[i][j];
+
+                if (cell instanceof Dead dead) {
+                    if (verifyBecomeAliveThreeLiveNeighbours(dead)) {
+                        var updatedCell = new Live(cell.row, cell.col);
+                        updatedCell.setChildren(cell.children);
+                        cells.nodes[i][j] = updatedCell;
+                    }
+                } else if (cell instanceof NotSet notSet) {
+                    if (verifyBecomeAliveThreeLiveNeighbours(notSet)) {
+                        var updatedCell = new Live(cell.row, cell.col);
+                        updatedCell.setChildren(cell.children);
+                        cells.nodes[i][j] = updatedCell;
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean verifyBecomeAliveThreeLiveNeighbours(Cell deadCell) {
+        return deadCell.children
+                .stream()
+                .map(c -> cells.nodes[c.x()][c.y()])
+                .filter(c -> c instanceof Live)
+                .count() >= 3;
     }
 }
