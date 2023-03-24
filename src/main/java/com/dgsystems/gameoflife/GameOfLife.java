@@ -91,10 +91,6 @@ public class GameOfLife {
     }
 
     public void tick() {
-        //var cellsCopy = Arrays.copyOf(cells.nodes, cells.nodes.length);
-
-        // copy array
-
         Cell[][] copiedArray = new Cell[cells.nodes.length][cells.nodes[0].length];
 
         for (int i = 0; i < cells.nodes.length; i++) {
