@@ -87,9 +87,7 @@ public abstract class Cell {
     }
 
     static char Live = '@';
-    static char Dead = '#';
-    static char NotSet = '?';
-
+    static char Dead = ' ';
 }
 
 record Position(int x, int y) { }
@@ -107,14 +105,6 @@ class Dead extends Cell {
 
     public Dead(int row, int col) {
         super(row, col);
-        state = '#';
-    }
-}
-
-class NotSet extends Cell {
-
-    public NotSet(int row, int col) {
-        super(row, col);
-        state = '?';
+        state = ' ';
     }
 }

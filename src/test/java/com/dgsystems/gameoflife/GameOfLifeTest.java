@@ -49,11 +49,11 @@ public class GameOfLifeTest {
         gameOfLife.applySeed(seed);
 
         char[][] expected = {
-            {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet},
-            {Cell.NotSet, Cell.NotSet, Cell.Live, Cell.NotSet, Cell.NotSet},
-            {Cell.NotSet, Cell.NotSet, Cell.Live, Cell.Live, Cell.NotSet},
-            {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet},
-            {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet}
+            {Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead},
+            {Cell.Dead, Cell.Dead, Cell.Live, Cell.Dead, Cell.Dead},
+            {Cell.Dead, Cell.Dead, Cell.Live, Cell.Live, Cell.Dead},
+            {Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead},
+            {Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead}
         };
 
         assertThat(gameOfLife.getCells()).isEqualTo(expected);
@@ -74,11 +74,11 @@ public class GameOfLifeTest {
         gameOfLife.tick();
 
         char[][] expected = {
-            {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet},
-            {Cell.NotSet, Cell.NotSet, Cell.Live, Cell.Live, Cell.NotSet},
-            {Cell.NotSet, Cell.NotSet, Cell.Live, Cell.Live, Cell.NotSet},
-            {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet},
-            {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet}
+            {Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead},
+            {Cell.Dead, Cell.Dead, Cell.Live, Cell.Live, Cell.Dead},
+            {Cell.Dead, Cell.Dead, Cell.Live, Cell.Live, Cell.Dead},
+            {Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead},
+            {Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead}
         };
         
         assertThat(gameOfLife.getCells()).isEqualTo(expected);
@@ -98,38 +98,57 @@ public class GameOfLifeTest {
         gameOfLife.tick();
 
         char[][] expected = {
-                {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet},
-                {Cell.NotSet, Cell.NotSet, Cell.Dead, Cell.Dead, Cell.NotSet},
-                {Cell.NotSet, Cell.NotSet, Cell.Dead, Cell.Dead, Cell.NotSet},
-                {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet},
-                {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet}
+                {Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead},
+                {Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead},
+                {Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead},
+                {Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead},
+                {Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead}
         };
 
         assertThat(gameOfLife.getCells()).isEqualTo(expected);
     }
 
     @Test
-    public void test_cell_with_three_live_neighbours_dies() {
+    public void test_cell_with_four_live_neighbours_dies() {
         var gameOfLife = new GameOfLife();
+
         List<Cell> seed = List.of(
+                new Dead(0, 0),
+                new Dead(0, 1),
+                new Dead(0, 2),
+                new Dead(0, 3),
+                new Dead(0, 4),
+                new Dead(1, 0),
                 new Dead(1, 1),
                 new Dead(1, 2),
                 new Dead(1, 3),
+                new Dead(1, 4),
+                new Dead(2, 0),
                 new Live(2, 1),
                 new Live(2, 2),
                 new Live(2, 3),
-                new Live(3, 2)
+                new Dead(2, 4),
+                new Dead(3, 0),
+                new Live(3, 1),
+                new Live(3, 2),
+                new Dead(3, 3),
+                new Dead(3, 4),
+                new Dead(4, 0),
+                new Dead(4, 1),
+                new Dead(4, 2),
+                new Dead(4, 3),
+                new Dead(4, 4)
         );
 
         gameOfLife.applySeed(seed);
         gameOfLife.tick();
 
         char[][] expected = {
-                {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet},
-                {Cell.NotSet, Cell.Dead, Cell.Live, Cell.Dead, Cell.NotSet},
-                {Cell.NotSet, Cell.Live, Cell.Dead, Cell.Live, Cell.NotSet},
-                {Cell.NotSet, Cell.NotSet, Cell.Dead, Cell.NotSet, Cell.NotSet},
-                {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet}
+                {Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead},
+                {Cell.Dead, Cell.Dead, Cell.Live, Cell.Dead, Cell.Dead},
+                {Cell.Dead, Cell.Live, Cell.Dead, Cell.Live, Cell.Dead},
+                {Cell.Dead, Cell.Live, Cell.Dead, Cell.Live, Cell.Dead},
+                {Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead}
         };
 
         assertThat(gameOfLife.getCells()).isEqualTo(expected);
@@ -138,14 +157,33 @@ public class GameOfLifeTest {
     @Test
     public void test_two_generations() {
         var gameOfLife = new GameOfLife();
+
         List<Cell> seed = List.of(
+                new Dead(0, 0),
+                new Dead(0, 1),
+                new Dead(0, 2),
+                new Dead(0, 3),
+                new Dead(0, 4),
+                new Dead(1, 0),
                 new Dead(1, 1),
                 new Dead(1, 2),
                 new Dead(1, 3),
+                new Dead(1, 4),
+                new Dead(2, 0),
                 new Live(2, 1),
                 new Live(2, 2),
                 new Live(2, 3),
-                new Live(3, 2)
+                new Dead(2, 4),
+                new Dead(3, 0),
+                new Dead(3, 1),
+                new Live(3, 2),
+                new Dead(3, 3),
+                new Dead(3, 4),
+                new Dead(4, 0),
+                new Dead(4, 1),
+                new Dead(4, 2),
+                new Dead(4, 3),
+                new Dead(4, 4)
         );
 
         gameOfLife.applySeed(seed);
@@ -153,13 +191,59 @@ public class GameOfLifeTest {
         gameOfLife.tick();
 
         char[][] expected = {
-                {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet},
-                {Cell.NotSet, Cell.Dead, Cell.Live, Cell.Dead, Cell.NotSet},
-                {Cell.NotSet, Cell.Dead, Cell.Live, Cell.Dead, Cell.NotSet},
-                {Cell.NotSet, Cell.NotSet, Cell.Dead, Cell.NotSet, Cell.NotSet},
-                {Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet, Cell.NotSet}
+                {Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead},
+                {Cell.Dead, Cell.Live, Cell.Live, Cell.Live, Cell.Dead},
+                {Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead},
+                {Cell.Dead, Cell.Live, Cell.Dead, Cell.Live, Cell.Dead},
+                {Cell.Dead, Cell.Dead, Cell.Live, Cell.Dead, Cell.Dead}
         };
 
         assertThat(gameOfLife.getCells()).isEqualTo(expected);
+    }
+
+    @Test
+    public void test_glider_for_one_generation() {
+        List<Cell> glider = List.of(
+                new Live(0, 0),
+                new Dead(0, 1),
+                new Live(0, 2),
+                new Dead(0, 3),
+                new Dead(0, 4),
+                new Dead(1, 0),
+                new Live(1, 1),
+                new Live(1, 2),
+                new Dead(1, 3),
+                new Dead(1, 4),
+                new Dead(2, 0),
+                new Live(2, 1),
+                new Dead(2, 2),
+                new Dead(2, 3),
+                new Dead(2, 4),
+                new Dead(3, 0),
+                new Dead(3, 1),
+                new Dead(3, 2),
+                new Dead(3, 3),
+                new Dead(3, 4),
+                new Dead(4, 0),
+                new Dead(4, 1),
+                new Dead(4, 2),
+                new Dead(4, 3),
+                new Dead(4, 4)
+        );
+
+        var gameOfLife = new GameOfLife();
+        gameOfLife.applySeed(glider);
+        gameOfLife.tick();
+
+        char[][] expected = {
+                {Cell.Dead, Cell.Dead, Cell.Live, Cell.Dead, Cell.Dead},
+                {Cell.Live, Cell.Dead, Cell.Live, Cell.Dead, Cell.Dead},
+                {Cell.Dead, Cell.Live, Cell.Live, Cell.Dead, Cell.Dead},
+                {Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead},
+                {Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead, Cell.Dead}
+        };
+
+        assertThat(gameOfLife.getCells()).isEqualTo(expected);
+
     }
 }

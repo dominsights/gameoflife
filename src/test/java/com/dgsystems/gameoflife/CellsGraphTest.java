@@ -16,11 +16,11 @@ public class CellsGraphTest {
     @Test
     public void test_insert_node() {
         var matrixGraph = new CellsGraph(5);
-        var cell = new NotSet(2, 2);
+        var cell = new Dead(2, 2);
         matrixGraph.add(cell);
         var retrieved = matrixGraph.get(2, 2);
         
-        var expected = new NotSet(2, 2);
+        var expected = new Dead(2, 2);
         expected.setChildren(List.of(
             new Position(1,1),
             new Position(1,2),

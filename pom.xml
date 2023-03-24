@@ -14,7 +14,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.dgsystems.gameoflife.GameOfLife</mainClass>
+                            <mainClass>com.dgsystems.gameoflife.Program</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -56,6 +56,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <exec.mainClass>com.dgsystems.gameoflife.GameOfLife</exec.mainClass>
+        <exec.mainClass>com.dgsystems.gameoflife.Program</exec.mainClass>
     </properties>
 </project>

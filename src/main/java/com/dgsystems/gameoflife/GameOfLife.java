@@ -3,64 +3,53 @@
  */
 package com.dgsystems.gameoflife;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
+
+import static com.dgsystems.gameoflife.CellsGraph.copy2dArray;
 
 /**
  * @author Domício
  */
 public class GameOfLife {
-
+    private static final int SIZE = 5;
     private final CellsGraph cells;
+
+    public GameOfLife() {
+        cells = new CellsGraph(SIZE);
+    }
 
     public char[][] getCells() {
         char[][] array = new char[SIZE][SIZE];
 
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                Cell data = cells.nodes[i][j];
-                if (data != null) {
-                    array[i][j] = data.state();
-                } else {
-                    array[i][j] = Cell.NotSet;
-                }
+        for (Cell[] outer : cells.nodes) {
+            for (Cell data : outer) {
+                array[data.row][data.col] = data.state();
             }
         }
 
         return array;
     }
 
-    public GameOfLife() {
-        cells = new CellsGraph(SIZE);
+    public void applySeed(List<Cell> seed) {
+        for (var cell : seed) {
+            cells.add(cell);
+        }
     }
 
-    private static final int SIZE = 5;
+    public void tick() {
+        Cell[][] copiedArray = copy2dArray(cells.nodes);
 
-    public static void main(String[] args) throws InterruptedException {
-        for (int i = 0; i < 10; i++) {
-            Thread.sleep(500);
-
-            char[] chars = {'#', '@', '?'};
-            Random rand = new Random();
-            char randomChar = chars[rand.nextInt(chars.length)];
-
-            char[][] cells = {
-                    {randomChar, randomChar, randomChar, randomChar, randomChar},
-                    {randomChar, randomChar, randomChar, randomChar, randomChar},
-                    {randomChar, randomChar, randomChar, randomChar, randomChar},
-                    {randomChar, randomChar, randomChar, randomChar, randomChar},
-                    {randomChar, randomChar, randomChar, randomChar, randomChar}
-            };
-
-            printCellsGrid(cells);
+        for (Cell[] outer : cells.nodes) {
+            for (Cell cell : outer) {
+                verifyRulesForDeadCells(copiedArray, cell);
+                verifyRulesForLiveCells(copiedArray, cell);
+            }
         }
 
-        System.out.print("\033[17B");
+        cells.nodes = copiedArray;
     }
 
     public static void printCellsGrid(char[][] cells) {
-
         System.out.println(" _____ _____ _____ _____ _____");
         System.out.println("|     |     |     |     |     |");
         System.out.println(String.format("|  %s  |  %s  |  %s  |  %s  |  %s  |", cells[0][0], cells[0][1], cells[0][2], cells[0][3], cells[0][4]));
@@ -81,82 +70,51 @@ public class GameOfLife {
         System.out.print("\033[?25l");
         System.out.print("\033[16F");
         System.out.flush();
-
     }
 
-    public void applySeed(List<Cell> seed) {
-        for (var cell : seed) {
-            cells.add(cell);
-        }
-    }
-
-    public void tick() {
-        Cell[][] copiedArray = new Cell[cells.nodes.length][cells.nodes[0].length];
-
-        for (int i = 0; i < cells.nodes.length; i++) {
-            copiedArray[i] = Arrays.copyOf(cells.nodes[i], cells.nodes[i].length);
-        }
-
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                Cell cell = cells.nodes[i][j];
-
-                if (cell instanceof Dead dead) {
-                    if (verifyBecomeAliveThreeLiveNeighbours(dead)) {
-                        var updatedCell = new Live(cell.row, cell.col);
-                        updatedCell.setChildren(cell.children);
-                        copiedArray[i][j] = updatedCell;
-                    }
-                }
-
-                if (cell instanceof NotSet notSet) {
-                    if (verifyBecomeAliveThreeLiveNeighbours(notSet)) {
-                        var updatedCell = new Live(cell.row, cell.col);
-                        updatedCell.setChildren(cell.children);
-                        copiedArray[i][j] = updatedCell;
-                    }
-                }
-
-                if (cell instanceof Live live) {
-                    if (verifyBecomeDeadLessThanTwoLiveNeighbours(live)) {
-                        var updatedCell = new Dead(cell.row, cell.col);
-                        updatedCell.setChildren(cell.children);
-                        copiedArray[i][j] = updatedCell;
-                    }
-
-                    if (verifyBecomeDeadMoreThanThreeLiveNeighbours(live)) {
-                        var updatedCell = new Dead(cell.row, cell.col);
-                        updatedCell.setChildren(cell.children);
-                        copiedArray[i][j] = updatedCell;
-                    }
-                }
+    private void verifyRulesForLiveCells(Cell[][] copiedArray, Cell cell) {
+        if (cell instanceof Live live) {
+            if (verifyBecomeDeadLessThanTwoLiveNeighbours(live) || verifyBecomeDeadMoreThanThreeLiveNeighbours(live)) {
+                updateDeadCell(copiedArray, cell);
             }
         }
+    }
 
-        cells.nodes = copiedArray;
+    private void verifyRulesForDeadCells(Cell[][] copiedArray, Cell cell) {
+        if (cell instanceof Dead dead && verifyBecomeAliveThreeLiveNeighbours(dead)) {
+            updateLiveCell(copiedArray, cell);
+        }
+    }
+
+    private static void updateLiveCell(Cell[][] copiedArray, Cell cell) {
+        var updatedCell = new Live(cell.row, cell.col);
+        updatedCell.setChildren(cell.children);
+        copiedArray[cell.row][cell.col] = updatedCell;
+    }
+
+    private static void updateDeadCell(Cell[][] copiedArray, Cell cell) {
+        var updatedCell = new Dead(cell.row, cell.col);
+        updatedCell.setChildren(cell.children);
+        copiedArray[cell.row][cell.col] = updatedCell;
     }
 
     private boolean verifyBecomeDeadMoreThanThreeLiveNeighbours(Live cell) {
-        return cell.children
-                .stream()
-                .map(c -> cells.nodes[c.x()][c.y()])
-                .filter(c -> c instanceof Live)
-                .count() >= 3;
+        return countLiveNeighbours(cell) > 3;
     }
 
     private boolean verifyBecomeDeadLessThanTwoLiveNeighbours(Live cell) {
+        return countLiveNeighbours(cell) < 2;
+    }
+
+    private boolean verifyBecomeAliveThreeLiveNeighbours(Cell cell) {
+        return countLiveNeighbours(cell) == 3;
+    }
+
+    private long countLiveNeighbours(Cell cell) {
         return cell.children
                 .stream()
                 .map(c -> cells.nodes[c.x()][c.y()])
                 .filter(c -> c instanceof Live)
-                .count() < 2;
-    }
-
-    private boolean verifyBecomeAliveThreeLiveNeighbours(Cell deadCell) {
-        return deadCell.children
-                .stream()
-                .map(c -> cells.nodes[c.x()][c.y()])
-                .filter(c -> c instanceof Live)
-                .count() >= 3;
+                .count();
     }
 }

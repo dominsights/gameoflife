@@ -4,6 +4,7 @@
  */
 package com.dgsystems.gameoflife;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,7 +22,7 @@ public class CellsGraph {
         
         for(int i = 0; i < size; i++) {
             for(int j = 0; j < size; j++) {
-                Cell node = new NotSet(i, j);
+                Cell node = new Dead(i, j);
                 nodes[i][j] = node;
             }
         }
@@ -50,6 +51,10 @@ public class CellsGraph {
         }
 
         nodes[cell.row()][cell.col()] = cell;
+    }
+
+    public static Cell[][] copy2dArray(Cell[][] array) {
+        return Arrays.stream(array).map(cells -> Arrays.copyOf(cells, cells.length)).toArray(Cell[][]::new);
     }
 
     public Cell get(int row, int col) {
