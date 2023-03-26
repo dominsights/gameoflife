@@ -5,26 +5,22 @@ package com.dgsystems.gameoflife;
 
 import java.util.List;
 
-import static com.dgsystems.gameoflife.CellsGraph.copy2dArray;
-
 /**
  * @author Domício
  */
 public class GameOfLife {
     private static final int SIZE = 5;
-    private final CellsGraph cells;
+    private CellsGraph cells;
 
     public GameOfLife() {
-        cells = new CellsGraph(SIZE);
+        cells = CellsGraph.newGraph(SIZE);
     }
 
     public char[][] getCells() {
         char[][] array = new char[SIZE][SIZE];
 
-        for (Cell[] outer : cells.nodes) {
-            for (Cell data : outer) {
-                array[data.row][data.col] = data.state();
-            }
+        for (Cell data : cells.getCells()) {
+            array[data.row][data.col] = data.state();
         }
 
         return array;
@@ -32,21 +28,27 @@ public class GameOfLife {
 
     public void applySeed(List<Cell> seed) {
         for (var cell : seed) {
-            cells.add(cell);
+            cells.updateCell(cell);
         }
     }
 
     public void tick() {
-        Cell[][] copiedArray = copy2dArray(cells.nodes);
+        var newCells = cells.clone();
 
-        for (Cell[] outer : cells.nodes) {
-            for (Cell cell : outer) {
-                verifyRulesForDeadCells(copiedArray, cell);
-                verifyRulesForLiveCells(copiedArray, cell);
+        for (Cell cell : cells.getCells()) {
+            if (cell instanceof Dead dead && verifyBecomeAliveThreeLiveNeighbours(dead)) {
+                var updatedCell = new Live(cell.row, cell.col);
+                newCells.updateCell(updatedCell);
+            }
+            if (cell instanceof Live live) {
+                if (verifyBecomeDeadLessThanTwoLiveNeighbours(live) || verifyBecomeDeadMoreThanThreeLiveNeighbours(live)) {
+                    var updatedCell = new Dead(cell.row, cell.col);
+                    newCells.updateCell(updatedCell);
+                }
             }
         }
 
-        cells.nodes = copiedArray;
+        cells = newCells;
     }
 
     public static void printCellsGrid(char[][] cells) {
@@ -72,32 +74,6 @@ public class GameOfLife {
         System.out.flush();
     }
 
-    private void verifyRulesForLiveCells(Cell[][] copiedArray, Cell cell) {
-        if (cell instanceof Live live) {
-            if (verifyBecomeDeadLessThanTwoLiveNeighbours(live) || verifyBecomeDeadMoreThanThreeLiveNeighbours(live)) {
-                updateDeadCell(copiedArray, cell);
-            }
-        }
-    }
-
-    private void verifyRulesForDeadCells(Cell[][] copiedArray, Cell cell) {
-        if (cell instanceof Dead dead && verifyBecomeAliveThreeLiveNeighbours(dead)) {
-            updateLiveCell(copiedArray, cell);
-        }
-    }
-
-    private static void updateLiveCell(Cell[][] copiedArray, Cell cell) {
-        var updatedCell = new Live(cell.row, cell.col);
-        updatedCell.setChildren(cell.children);
-        copiedArray[cell.row][cell.col] = updatedCell;
-    }
-
-    private static void updateDeadCell(Cell[][] copiedArray, Cell cell) {
-        var updatedCell = new Dead(cell.row, cell.col);
-        updatedCell.setChildren(cell.children);
-        copiedArray[cell.row][cell.col] = updatedCell;
-    }
-
     private boolean verifyBecomeDeadMoreThanThreeLiveNeighbours(Live cell) {
         return countLiveNeighbours(cell) > 3;
     }
@@ -111,9 +87,8 @@ public class GameOfLife {
     }
 
     private long countLiveNeighbours(Cell cell) {
-        return cell.children
+        return cells.getNeighbours(cell)
                 .stream()
-                .map(c -> cells.nodes[c.x()][c.y()])
                 .filter(c -> c instanceof Live)
                 .count();
     }

@@ -21,7 +21,6 @@ public abstract class Cell {
     public Cell(int row, int col) {
         this.row = row;
         this.col = col;
-        children = new ArrayList<>();
     }
 
     public int row() {
@@ -37,53 +36,16 @@ public abstract class Cell {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 29 * hash + this.row;
-        hash = 29 * hash + this.col;
-        hash = 29 * hash + this.state;
-        hash = 29 * hash + Objects.hashCode(this.children);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || !(o instanceof Cell)) return false;
+        Cell cell = (Cell) o;
+        return row == cell.row && col == cell.col;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Cell other = (Cell) obj;
-        if (this.row != other.row) {
-            return false;
-        }
-        if (this.col != other.col) {
-            return false;
-        }
-        if (this.state != other.state) {
-            return false;
-        }
-        return Objects.equals(this.children, other.children);
-    }
-
-    List<Position> children;
-
-    /**
-     * @return the children
-     */
-    public List<Position> getChildren() {
-        return children;
-    }
-
-    /**
-     * @param children the children to set
-     */
-    public void setChildren(List<Position> children) {
-        this.children = children;
+    public int hashCode() {
+        return Objects.hash(row, col);
     }
 
     static char Live = '@';
